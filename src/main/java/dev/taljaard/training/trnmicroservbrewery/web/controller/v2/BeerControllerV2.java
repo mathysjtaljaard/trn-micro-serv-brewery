@@ -16,11 +16,10 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import dev.taljaard.training.trnmicroservbrewery.services.v2.BeerServiceV2;
-import dev.taljaard.training.trnmicroservbrewery.web.controller.BeerController;
 import dev.taljaard.training.trnmicroservbrewery.web.model.v2.BeerDtoV2;
 
 @RestController
-@RequestMapping(BeerController.PATH)
+@RequestMapping(BeerControllerV2.PATH)
 public class BeerControllerV2 {
 
     public static final String PATH = "/api/v2/beer";
