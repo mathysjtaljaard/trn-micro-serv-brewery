@@ -1,11 +1,17 @@
 package dev.taljaard.training.trnmicroservbrewery.web.controller;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
+
+import javax.validation.ConstraintViolationException;
+import javax.validation.Valid;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -35,7 +41,7 @@ public class BeerController {
     }
 
     @PostMapping
-    public ResponseEntity<String> createBeer(@RequestBody BeerDto beer) {
+    public ResponseEntity<String> createBeer(@Valid @RequestBody BeerDto beer) {
         System.out.println(beer);
         BeerDto savedBeer = beerService.saveBeer(beer);
 
@@ -45,7 +51,7 @@ public class BeerController {
     }
 
     @PutMapping("/{beerId}")
-    public ResponseEntity<String> updateBeer(@PathVariable UUID beerId, @RequestBody BeerDto beerDto) {
+    public ResponseEntity<String> updateBeer(@PathVariable UUID beerId, @Valid @RequestBody BeerDto beerDto) {
         System.out.println(beerDto);
         beerService.updateBeer(beerId, beerDto);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -55,5 +61,16 @@ public class BeerController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteBeer(@PathVariable UUID beerId) {
         beerService.deleteBeerById(beerId);
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<List<String>> validationResponseHandler(ConstraintViolationException ex) {
+        List<String> errors = new ArrayList<>(ex.getConstraintViolations().size());
+
+        ex.getConstraintViolations().forEach(violion -> {
+            errors.add(violion.getPropertyPath() + " ;" + violion.getMessage());
+        });
+
+        return new ResponseEntity<List<String>>(errors, HttpStatus.BAD_REQUEST);
     }
 }

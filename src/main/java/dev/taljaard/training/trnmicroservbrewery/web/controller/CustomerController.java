@@ -2,6 +2,8 @@ package dev.taljaard.training.trnmicroservbrewery.web.controller;
 
 import java.util.UUID;
 
+import javax.validation.Valid;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,7 +36,7 @@ public class CustomerController {
     }
 
     @PostMapping
-    public ResponseEntity<String> createCustomer(@RequestBody CustomerDto customerDto) {
+    public ResponseEntity<String> createCustomer(@Valid @RequestBody CustomerDto customerDto) {
         System.out.println(customerDto);
         CustomerDto savedCustomer = customerService.createCustomer(customerDto);
         HttpHeaders headers = new HttpHeaders();
@@ -43,7 +45,8 @@ public class CustomerController {
     }
 
     @PutMapping("/{customerId}")
-    public ResponseEntity<String> updateCustomer(@PathVariable UUID customerId, @RequestBody CustomerDto customerDto) {
+    public ResponseEntity<String> updateCustomer(@PathVariable UUID customerId,
+            @Valid @RequestBody CustomerDto customerDto) {
         System.out.println(customerDto);
         customerService.updateCustomer(customerId, customerDto);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
