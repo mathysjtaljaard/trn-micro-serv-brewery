@@ -62,15 +62,4 @@ public class BeerController {
     public void deleteBeer(@PathVariable UUID beerId) {
         beerService.deleteBeerById(beerId);
     }
-
-    @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<List<String>> validationResponseHandler(ConstraintViolationException ex) {
-        List<String> errors = new ArrayList<>(ex.getConstraintViolations().size());
-
-        ex.getConstraintViolations().forEach(violion -> {
-            errors.add(violion.getPropertyPath() + " ;" + violion.getMessage());
-        });
-
-        return new ResponseEntity<List<String>>(errors, HttpStatus.BAD_REQUEST);
-    }
 }
