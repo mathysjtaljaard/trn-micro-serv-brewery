@@ -28,7 +28,7 @@ import dev.taljaard.training.trnmicroservbrewery.web.model.BeerDto;
 @RequestMapping(BeerController.PATH)
 public class BeerController {
 
-    public static final String PATH = "/api/v1/beer";
+    public static final String PATH = "/api/v1/beer/";
     private final BeerService beerService;
 
     public BeerController(BeerService beerService) {
