@@ -1,4 +1,4 @@
-package dev.taljaard.training.trnmicroservbrewery.domain;
+package dev.taljaard.training.trnmicroservbrewery.web.mappers;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
