@@ -1,13 +1,18 @@
 package dev.taljaard.training.trnmicroservbrewery.web.controller;
 
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
+import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,7 +28,7 @@ import dev.taljaard.training.trnmicroservbrewery.web.model.CustomerDto;
 @RequestMapping(CustomerController.PATH)
 public class CustomerController {
 
-    public static final String PATH = "/api/v1/customer";
+    public static final String PATH = "/api/v1/customer/";
     private CustomerService customerService;
 
     public CustomerController(CustomerService customerService) {
@@ -56,5 +61,13 @@ public class CustomerController {
     public ResponseEntity<String> deleteCustomer(@PathVariable UUID customerId) {
         customerService.deleteCustomerById(customerId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<List<String>> validationExceptionHandler(ConstraintViolationException ex) {
+        List<String> errors = ex.getConstraintViolations().stream().map(error -> {
+            return ex.getMessage();
+        }).collect(Collectors.toList());
+        return new ResponseEntity<List<String>>(errors, HttpStatus.BAD_REQUEST);
     }
 }

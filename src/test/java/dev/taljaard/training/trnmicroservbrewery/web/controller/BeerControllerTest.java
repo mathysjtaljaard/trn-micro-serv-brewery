@@ -24,6 +24,7 @@ import dev.taljaard.training.trnmicroservbrewery.web.model.BeerDto;
 @WebMvcTest(BeerController.class)
 public class BeerControllerTest {
 
+    private static final String API_PATH = BeerController.PATH;
     @MockBean
     private BeerService beerService;
 
@@ -45,8 +46,9 @@ public class BeerControllerTest {
     public void getBeerById() throws Exception {
         when(beerService.getBeerById(any(UUID.class))).thenReturn(beerDto);
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/beer/" + UUID.randomUUID().toString())
-                .accept(MediaType.APPLICATION_JSON)).andExpect(MockMvcResultMatchers.status().isOk())
+        mockMvc.perform(
+                MockMvcRequestBuilders.get(API_PATH + UUID.randomUUID().toString()).accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id", Is.is(beerDto.getId().toString())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.beerName", Is.is(beerDto.getBeerName())));
     }
@@ -59,8 +61,7 @@ public class BeerControllerTest {
         beerDto.setId(UUID.randomUUID());
         when(beerService.saveBeer(any(BeerDto.class))).thenReturn(beerDto);
 
-        mockMvc.perform(
-                MockMvcRequestBuilders.post("/api/v1/beer/").content(beerJson).contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(MockMvcRequestBuilders.post(API_PATH).content(beerJson).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isCreated());
     }
 
@@ -69,7 +70,7 @@ public class BeerControllerTest {
         beerDto.setId(null);
         String beerJson = objectMapper.writeValueAsString(beerDto);
 
-        mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/beer/" + UUID.randomUUID().toString())
+        mockMvc.perform(MockMvcRequestBuilders.put(API_PATH + UUID.randomUUID().toString())
                 .contentType(MediaType.APPLICATION_JSON).content(beerJson))
                 .andExpect(MockMvcResultMatchers.status().isNoContent());
     }
