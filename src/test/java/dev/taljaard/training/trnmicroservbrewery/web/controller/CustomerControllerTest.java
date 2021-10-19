@@ -9,18 +9,25 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.restdocs.RestDocumentationExtension;
+import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation;
+import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
+import org.springframework.restdocs.request.RequestDocumentation;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import dev.taljaard.training.trnmicroservbrewery.services.CustomerService;
 import dev.taljaard.training.trnmicroservbrewery.web.model.CustomerDto;
 
+@ExtendWith(RestDocumentationExtension.class)
+@AutoConfigureRestDocs
 @WebMvcTest(CustomerController.class)
 public class CustomerControllerTest {
 
@@ -45,8 +52,11 @@ public class CustomerControllerTest {
     @Test
     public void testGetCustomerById() throws Exception {
 
-        mockMvc.perform(MockMvcRequestBuilders.get(API_PATH + UUID.randomUUID()))
-                .andExpect(MockMvcResultMatchers.status().isOk());
+        mockMvc.perform(RestDocumentationRequestBuilders.get(API_PATH + "{customerId}", UUID.randomUUID()))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andDo(MockMvcRestDocumentation.document("v1/customer",
+                        RequestDocumentation.pathParameters(RequestDocumentation.parameterWithName("customerId")
+                                .description("UUID of desired customer to get"))));
     }
 
     @Test
@@ -55,7 +65,8 @@ public class CustomerControllerTest {
         customer.setId(null);
         String json = objectMapper.writeValueAsString(customer);
 
-        mockMvc.perform(MockMvcRequestBuilders.post(API_PATH).content(json).contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(
+                RestDocumentationRequestBuilders.post(API_PATH).content(json).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isCreated())
                 .andExpect(MockMvcResultMatchers.header().exists(HttpHeaders.LOCATION));
     }
@@ -65,7 +76,8 @@ public class CustomerControllerTest {
 
         String json = objectMapper.writeValueAsString(CustomerDto.builder().name("12").build());
 
-        mockMvc.perform(MockMvcRequestBuilders.post(API_PATH).content(json).contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(
+                RestDocumentationRequestBuilders.post(API_PATH).content(json).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
 
@@ -74,14 +86,14 @@ public class CustomerControllerTest {
         customer.setId(null);
         String json = objectMapper.writeValueAsString(customer);
 
-        mockMvc.perform(MockMvcRequestBuilders.put(API_PATH + UUID.randomUUID()).content(json)
+        mockMvc.perform(RestDocumentationRequestBuilders.put(API_PATH + UUID.randomUUID()).content(json)
                 .contentType(MediaType.APPLICATION_JSON)).andExpect(MockMvcResultMatchers.status().isNoContent());
     }
 
     @Test
     void testDeleteCustomer() throws Exception {
 
-        mockMvc.perform(MockMvcRequestBuilders.delete(API_PATH + UUID.randomUUID()))
+        mockMvc.perform(RestDocumentationRequestBuilders.delete(API_PATH + UUID.randomUUID()))
                 .andExpect(MockMvcResultMatchers.status().isNoContent());
     }
 }
